@@ -42,7 +42,7 @@
                                 setTimeout(()=>{
 
                                     this.rules.setEndGame();
-                                    this.cases = this.rules.setNewGame(this.ctx);
+                                    this.cases = this.rules.setNewGame(this.ctx,this.images);
                                 },100);
                             }
                             if(current.closestNumber===0) {
