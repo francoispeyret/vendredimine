@@ -5,12 +5,13 @@
 </template>
 <script>
     import Case from '../classes/Case.js';
+    import Mouse from '../classes/Mouse.js';
 
     export default {
         name: 'Game',
         data () {
             return {
-                msg: 'Welcome to Your Vue.js App'
+                draw: null,
             }
         },
         mounted() {
@@ -19,24 +20,37 @@
 
             let cases = [];
 
-            for(let y = 0; y < 10; y++) {
-                for(let x = 0; x < 10; x++) {
+            for(let x = 0; x < 10; x++) {
+                for(let y = 0; y < 10; y++) {
                     let mine = Math.floor(Math.random() * Math.floor(10));
-                    cases.push(
-                        new Case(
-                            x,y,
-                            ctx,
-                            mine > 8
-                        )
-                    );
+                    cases[x+':'+y] = new Case(
+                        x,y,
+                        ctx,
+                        mine > 8
+                    )
                 }
             }
-            for(let i = 0; i < cases.length; i++) {
-                cases[i].show();
-            }
+
+            this.$refs["myCanvas"].onmousemove = Mouse.mouseOver;
+
+            this.draw = setInterval(()=>{
+                for(let x = 0; x < 10; x++) {
+                    for(let y = 0; y < 10; y++) {
+                        if(Mouse.position.x > 300) {
+                            cases[x+':'+y].show(true);
+                        } else {
+                            cases[x+':'+y].show(false);
+                        }
+                    }
+                }
+            },60);
+
 
             console.log(cases);
 
+        },
+        destroyed() {
+            clearInterval(this.draw);
         }
     }
 </script>

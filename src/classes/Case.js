@@ -7,7 +7,7 @@ class Case {
         this.mine = mine;
     }
 
-    show() {
+    show(test) {
         this.ctx.beginPath();
         this.ctx.rect(
             this.x * this.w + 1,
@@ -19,7 +19,10 @@ class Case {
 
         if (this.mine) {
             this.ctx.beginPath();
-            this.ctx.fillStyle = "tomato";
+            if(test)
+                this.ctx.fillStyle = "tomato";
+            else
+                this.ctx.fillStyle = "green";
             this.ctx.arc(
                 this.x * this.w + this.w / 2,
                 this.y * this.w + this.w / 2,
@@ -28,7 +31,6 @@ class Case {
                 2 * Math.PI);
             this.ctx.fill();
         }
-
     }
 }
 
