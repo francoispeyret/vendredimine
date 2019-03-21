@@ -73,32 +73,71 @@ class Case {
         if(this.mine) {
             this.closestNumber = '*';
         } else {
-            if(this.checkCase(cases,-1,-1))
+            if(this.checkCaseMine(cases,-1,-1))
                 this.closestNumber++;
-            if(this.checkCase(cases,0,-1))
+            if(this.checkCaseMine(cases,0,-1))
                 this.closestNumber++;
-            if(this.checkCase(cases,1,-1))
+            if(this.checkCaseMine(cases,1,-1))
                 this.closestNumber++;
-            if(this.checkCase(cases,-1,0))
+            if(this.checkCaseMine(cases,-1,0))
                 this.closestNumber++;
-            if(this.checkCase(cases,1,0))
+            if(this.checkCaseMine(cases,1,0))
                 this.closestNumber++;
-            if(this.checkCase(cases,-1,1))
+            if(this.checkCaseMine(cases,-1,1))
                 this.closestNumber++;
-            if(this.checkCase(cases,0,1))
+            if(this.checkCaseMine(cases,0,1))
                 this.closestNumber++;
-            if(this.checkCase(cases,1,1))
+            if(this.checkCaseMine(cases,1,1))
                 this.closestNumber++;
         }
     }
 
-    checkCase(cases,x,y) {
+    checkCaseMine(cases,x,y) {
         if(typeof cases[(this.x+x)+':'+(this.y+y)] !== "undefined") {
             if(cases[(this.x+x)+':'+(this.y+y)].mine === true) {
                 return true;
             }
         }
         return false;
+    }
+
+    clickClosest(cases,refx,refy) {
+        if(this.checkCaseZero(cases,refx,refy,-1,-1))
+            this.setClickedCase(cases,refx,refy,-1,-1);
+        if(this.checkCaseZero(cases,refx,refy,0,-1))
+            this.setClickedCase(cases,refx,refy,0,-1);
+        if(this.checkCaseZero(cases,refx,refy,1,-1))
+            this.setClickedCase(cases,refx,refy,1,-1);
+        if(this.checkCaseZero(cases,refx,refy,-1,0))
+            this.setClickedCase(cases,refx,refy,-1,0);
+        if(this.checkCaseZero(cases,refx,refy,1,0))
+            this.setClickedCase(cases,refx,refy,1,0);
+        if(this.checkCaseZero(cases,refx,refy,-1,1))
+            this.setClickedCase(cases,refx,refy,-1,1);
+        if(this.checkCaseZero(cases,refx,refy,0,1))
+            this.setClickedCase(cases,refx,refy,0,1);
+        if(this.checkCaseZero(cases,refx,refy,1,1))
+            this.setClickedCase(cases,refx,refy,1,1);
+    }
+
+    checkCaseZero(cases,refx,refy,x,y) {
+        if(typeof cases[(refx+x)+':'+(refy+y)] !== "undefined") {
+            let current = cases[(refx+x)+':'+(refy+y)];
+            if(parseInt(current.closestNumber) >= 0 && current.clicked===false) {
+                // if(parseInt(current.closestNumber)===0 ) {
+                //     this.clickClosest(cases,current.x,current.y);
+                // }
+                return true;
+            }
+        }
+        return false;
+    }
+    setClickedCase(cases,refx,refy,x,y) {
+        if(typeof cases[(refx+x)+':'+(refy+y)] !== "undefined") {
+            if(cases[(refx+x)+':'+(refy+y)].clicked === false) {
+                cases[(refx+x)+':'+(refy+y)].clicked = true;
+            }
+        }
     }
 }
 

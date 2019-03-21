@@ -31,6 +31,9 @@
                                 this.rules.setEndGame();
                                 this.cases = this.rules.setNewGame(this.ctx);
                             }
+                            if(current.closestNumber===0) {
+                                current.clickClosest(this.cases,current.x,current.y);
+                            }
                         }
                     }
                 }
