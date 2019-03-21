@@ -1,11 +1,20 @@
 <template>
     <div>
-        <canvas ref="myCanvas" width="600" height="600" @click="clickOnCanvas"></canvas>
+        <canvas
+                ref="myCanvas"
+                width="300" height="300"
+                @click="clickOnCanvas"
+                @contextmenu="rightClickOnCanvas"
+        ></canvas>
+        <div style="display:none;">
+            <img ref="bombImage"
+                 src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/155/bomb_1f4a3.png"
+                 width="25" height="25">
+        </div>
     </div>
 </template>
 <script>
     import Rules from '../classes/Rules.js';
-    import Case from '../classes/Case.js';
     import Mouse from '../classes/Mouse.js';
 
     export default {
@@ -18,6 +27,7 @@
                 casesY: 10,
                 rules: new Rules(),
                 ctx: null,
+                images: {}
             }
         },
         methods: {
@@ -28,8 +38,12 @@
                         if(current.overred === true) {
                             current.setClicked();
                             if(current.mine === true) {
-                                this.rules.setEndGame();
-                                this.cases = this.rules.setNewGame(this.ctx);
+                                this.drawCanvas();
+                                setTimeout(()=>{
+
+                                    this.rules.setEndGame();
+                                    this.cases = this.rules.setNewGame(this.ctx);
+                                },100);
                             }
                             if(current.closestNumber===0) {
                                 current.clickClosest(this.cases,current.x,current.y);
@@ -37,20 +51,23 @@
                         }
                     }
                 }
-            }
-        },
-        mounted() {
-            let c = this.$refs["myCanvas"];
-            this.ctx = c.getContext("2d");
-
-            this.cases = this.rules.setNewGame(this.ctx);
-
-            this.$refs["myCanvas"].onmousemove = Mouse.mouseOver;
-
-            this.draw = setInterval(()=>{
+            },
+            rightClickOnCanvas(e) {
+                e.preventDefault();
+                for(let x = 0; x < this.casesX; x++) {
+                    for(let y = 0; y < this.casesY; y++) {
+                        let current  = this.cases[x+':'+y];
+                        if(current.overred === true && !current.clicked) {
+                            current.setRightClicked();
+                        }
+                    }
+                }
+            },
+            drawCanvas() {
                 // fond
                 this.ctx.fillStyle = '#fff';
                 this.ctx.fillRect(0,0,600,600);
+
 
                 for(let x = 0; x < this.casesX; x++) {
                     for(let y = 0; y < this.casesY; y++) {
@@ -61,13 +78,31 @@
                             current.y * current.w < Mouse.position.y &&
                             current.y * current.w + current.w >= Mouse.position.y
                         )
-                                current.overred = true;
+                            current.overred = true;
                         else
                             current.overred = false;
                         current.show();
                     }
                 }
-            },100);
+            }
+        },
+        mounted() {
+            this.images.bomb = this.$refs["bombImage"];
+
+            this.images.bomb.onload = ()=>{
+
+                let c = this.$refs["myCanvas"];
+                this.ctx = c.getContext("2d");
+
+                this.cases = this.rules.setNewGame(this.ctx,this.images);
+
+                this.$refs["myCanvas"].onmousemove = Mouse.mouseOver;
+
+                this.draw = setInterval(()=>{
+                    this.drawCanvas();
+                },100);
+            };
+
 
         },
         destroyed() {

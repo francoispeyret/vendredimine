@@ -1,20 +1,28 @@
 class Case {
-    constructor(x, y, ctx, mine) {
+    constructor(x, y, ctx, mine,images) {
         this.x = x;
         this.y = y;
-        this.w = 59;
+        this.w = 29;
         this.ctx = ctx;
         this.mine = mine;
         this.overred = false;
         this.clicked = false;
         this.closestNumber = 0;
-
+        this.safeMode = false;
+        this.images = images;
     }
 
     show() {
         this.getStrokeCase();
         this.getCaseDisplay();
-        this.getNumberDisplay();
+        if(this.clicked) {
+            if(!this.mine) {
+
+                this.getNumberDisplay();
+            } else {
+                this.getMineDisplay();
+            }
+        }
     }
 
     getCaseDisplay() {
@@ -29,8 +37,16 @@ class Case {
         this.ctx.fill();
     }
 
+    getMineDisplay() {
+        this.ctx.drawImage(this.images.bomb,
+            this.x * this.w+3,
+            this.y * this.w+3,
+            22,22);
+    }
+
     getStrokeCase() {
         this.ctx.beginPath();
+        this.ctx.lineWidth=0.1;
         this.ctx.rect(
             this.x * this.w + 1,
             this.y * this.w + 1,
@@ -43,30 +59,46 @@ class Case {
     getCaseColor() {
         if(this.clicked) {
             this.ctx.fillStyle = "#fff";
-            // this.ctx.fillStyle = "blue";
         } else {
-            // if(this.overred && this.mine)
-            //     this.ctx.fillStyle = "red";
-            // else if(!this.overred && this.mine)
-            //         this.ctx.fillStyle = "tomato";
-            if(this.overred)
-                this.ctx.fillStyle = "#eee";
-            else
-                this.ctx.fillStyle = "white";
+            if(this.safeMode) {
+                this.ctx.fillStyle = "tomato";
+            } else {
+                if(this.overred)
+                    this.ctx.fillStyle = "#eee";
+                else
+                    this.ctx.fillStyle = "white";
+            }
         }
     }
 
     getNumberDisplay() {
-        if(!this.mine && this.clicked) {
-            this.ctx.fillStyle = "#aaa";
+        if(!this.mine /*&& this.clicked*/) {
+            if(this.closestNumber === 0)
+                this.ctx.fillStyle = "#e0e0e0";
+            else if(this.closestNumber === 1)
+                this.ctx.fillStyle = "#c0c0c0";
+            else if(this.closestNumber === 2)
+                this.ctx.fillStyle = "#a0a0a0";
+            else if(this.closestNumber === 3)
+                this.ctx.fillStyle = "#909090";
+            else if(this.closestNumber === 4)
+                this.ctx.fillStyle = "#996666";
+            else if(this.closestNumber === 5)
+                this.ctx.fillStyle = "tomato";
+            else if(this.closestNumber > 5)
+                this.ctx.fillStyle = "red";
             this.ctx.textAlign = "center";
-            this.ctx.font = "28px Mono";
+            this.ctx.font = "18px Monospace";
             this.ctx.fillText(this.closestNumber, this.x*this.w+this.w/2, this.y*this.w+this.w/1.5);
         }
     }
 
     setClicked() {
         this.clicked = true;
+    }
+
+    setRightClicked() {
+        this.safeMode = !this.safeMode;
     }
 
     getClosest(cases) {
@@ -124,6 +156,7 @@ class Case {
         if(typeof cases[(refx+x)+':'+(refy+y)] !== "undefined") {
             let current = cases[(refx+x)+':'+(refy+y)];
             if(parseInt(current.closestNumber) >= 0 && current.clicked===false) {
+                // @todo : recursive ?
                 // if(parseInt(current.closestNumber)===0 ) {
                 //     this.clickClosest(cases,current.x,current.y);
                 // }
