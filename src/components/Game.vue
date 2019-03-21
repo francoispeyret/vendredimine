@@ -1,9 +1,10 @@
 <template>
     <div>
-        <canvas ref="myCanvas" width="600" height="600"></canvas>
+        <canvas ref="myCanvas" width="600" height="600" @click="clickOnCanvas"></canvas>
     </div>
 </template>
 <script>
+    import Rules from '../classes/Rules.js';
     import Case from '../classes/Case.js';
     import Mouse from '../classes/Mouse.js';
 
@@ -12,41 +13,58 @@
         data () {
             return {
                 draw: null,
+                cases: [],
+                casesX: 10,
+                casesY: 10,
+                rules: new Rules(),
+                ctx: null,
+            }
+        },
+        methods: {
+            clickOnCanvas() {
+                for(let x = 0; x < this.casesX; x++) {
+                    for(let y = 0; y < this.casesY; y++) {
+                        let current  = this.cases[x+':'+y];
+                        if(current.overred === true) {
+                            current.setClicked();
+                            if(current.mine === true) {
+                                this.rules.setEndGame();
+                                this.cases = this.rules.setNewGame(this.ctx);
+                            }
+                        }
+                    }
+                }
             }
         },
         mounted() {
             let c = this.$refs["myCanvas"];
-            let ctx = c.getContext("2d");
+            this.ctx = c.getContext("2d");
 
-            let cases = [];
-
-            for(let x = 0; x < 10; x++) {
-                for(let y = 0; y < 10; y++) {
-                    let mine = Math.floor(Math.random() * Math.floor(10));
-                    cases[x+':'+y] = new Case(
-                        x,y,
-                        ctx,
-                        mine > 8
-                    )
-                }
-            }
+            this.cases = this.rules.setNewGame(this.ctx);
 
             this.$refs["myCanvas"].onmousemove = Mouse.mouseOver;
 
             this.draw = setInterval(()=>{
-                for(let x = 0; x < 10; x++) {
-                    for(let y = 0; y < 10; y++) {
-                        if(Mouse.position.x > 300) {
-                            cases[x+':'+y].show(true);
-                        } else {
-                            cases[x+':'+y].show(false);
-                        }
+                // fond
+                this.ctx.fillStyle = '#fff';
+                this.ctx.fillRect(0,0,600,600);
+
+                for(let x = 0; x < this.casesX; x++) {
+                    for(let y = 0; y < this.casesY; y++) {
+                        let current  = this.cases[x+':'+y];
+                        if(
+                            current.x * current.w < Mouse.position.x &&
+                            current.x * current.w + current.w >= Mouse.position.x &&
+                            current.y * current.w < Mouse.position.y &&
+                            current.y * current.w + current.w >= Mouse.position.y
+                        )
+                                current.overred = true;
+                        else
+                            current.overred = false;
+                        current.show();
                     }
                 }
-            },60);
-
-
-            console.log(cases);
+            },100);
 
         },
         destroyed() {
