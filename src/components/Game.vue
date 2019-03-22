@@ -4,6 +4,7 @@
                 ref="myCanvas"
                 width="300" height="300"
                 @click="clickOnCanvas"
+                @mousemove="mousemoveOnCanvas"
                 @contextmenu="rightClickOnCanvas"
         ></canvas>
         <div style="display:none;">
@@ -16,6 +17,7 @@
 <script>
     import Rules from '../classes/Rules.js';
     import Mouse from '../classes/Mouse.js';
+    import io from 'socket.io-client';
 
     export default {
         name: 'Game',
@@ -27,6 +29,7 @@
                 casesY: 10,
                 rules: new Rules(),
                 ctx: null,
+                socket: io,
                 images: {}
             }
         },
@@ -63,10 +66,14 @@
                     }
                 }
             },
+            mousemoveOnCanvas(e) {
+                Mouse.mouseOver(e,this.socket);
+            },
             drawCanvas() {
                 // fond
                 this.ctx.fillStyle = '#fff';
                 this.ctx.fillRect(0,0,600,600);
+
 
 
                 for(let x = 0; x < this.casesX; x++) {
@@ -84,19 +91,28 @@
                         current.show();
                     }
                 }
+            },
+            mouseClientView(data) {
+                console.log('data',data);
+                console.log('mouseClientView');
+                this.ctx.beginPath();
+                this.ctx.rect(data.x,data.y,20,20);
+                this.ctx.fillStyle = '#000';
+                this.ctx.fill();
             }
         },
         mounted() {
             this.images.bomb = this.$refs["bombImage"];
 
+
             this.images.bomb.onload = ()=>{
+                this.socket = this.socket('http://192.168.212.66:3000');
+                this.socket.on('mouse', this.mouseClientView);
 
                 let c = this.$refs["myCanvas"];
                 this.ctx = c.getContext("2d");
 
                 this.cases = this.rules.setNewGame(this.ctx,this.images);
-
-                this.$refs["myCanvas"].onmousemove = Mouse.mouseOver;
 
                 this.draw = setInterval(()=>{
                     this.drawCanvas();

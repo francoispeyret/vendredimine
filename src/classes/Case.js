@@ -46,7 +46,8 @@ class Case {
 
     getStrokeCase() {
         this.ctx.beginPath();
-        this.ctx.lineWidth=0.1;
+        this.ctx.lineWidth=1;
+        this.ctx.strokeStyle='#ccc';
         this.ctx.rect(
             this.x * this.w + 1,
             this.y * this.w + 1,
@@ -74,9 +75,9 @@ class Case {
     getNumberDisplay() {
         if(!this.mine /*&& this.clicked*/) {
             if(this.closestNumber === 0)
-                this.ctx.fillStyle = "#e0e0e0";
+                this.ctx.fillStyle = "#f0f0f0";
             else if(this.closestNumber === 1)
-                this.ctx.fillStyle = "#c0c0c0";
+                this.ctx.fillStyle = "#d0d0d0";
             else if(this.closestNumber === 2)
                 this.ctx.fillStyle = "#a0a0a0";
             else if(this.closestNumber === 3)
