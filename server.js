@@ -16,20 +16,14 @@ var io = socket(server);
 
 const Rules = require('./src/classes/Rules.js');
 const gameRules = new Rules();
-const game = {
-    map: gameRules.setNewGame(null,null)
-}
+let gameMap = gameRules.setNewGame(null,null);
 
-io.sockets.on('connection', function(socket){
+io.sockets.on('connection', socket => {
+    console.log('newConnection - '+socket.id);
+        let data = JSON.stringify(gameMap);
+        io.sockets.emit('load the map',data);
 
-        var mapJson = JSON.stringify(game.map);
-        console.log(mapJson);
-        console.log(game.map);
-
-        socket.json.emit('init',game.map);
-
-        console.log('newConnection - '+socket.id);
         socket.on('mouse', function(data) {
-            socket.emit('mouse',data);
+            socket.broadcast.emit('mouse',data);
         });
 });

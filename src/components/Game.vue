@@ -16,6 +16,7 @@
 </template>
 <script>
     //import Rules from '../classes/Rules.js';
+    import Case from '../classes/Case-client.js';
     import Mouse from '../classes/Mouse.js';
     import io from 'socket.io-client';
 
@@ -29,7 +30,7 @@
                 casesY: 10,
                 //rules: new Rules(),
                 ctx: null,
-                socket: io,
+                socket: io('http://127.0.0.1:3000'),
                 images: {}
             }
         },
@@ -74,54 +75,72 @@
                 this.ctx.fillStyle = '#fff';
                 this.ctx.fillRect(0,0,600,600);
 
-
-
-                for(let x = 0; x < this.casesX; x++) {
-                    for(let y = 0; y < this.casesY; y++) {
-                        let current  = this.cases[x+':'+y];
-                        if(
-                            current.x * current.w < Mouse.position.x &&
-                            current.x * current.w + current.w >= Mouse.position.x &&
-                            current.y * current.w < Mouse.position.y &&
-                            current.y * current.w + current.w >= Mouse.position.y
-                        )
-                            current.overred = true;
-                        else
-                            current.overred = false;
-                        current.show();
+                if(typeof this.cases[0+':'+0] !== 'undefined') {
+                    for(let x = 0; x < this.casesX; x++) {
+                        for(let y = 0; y < this.casesY; y++) {
+                            let current  = this.cases[x+':'+y];
+                            if(
+                                current.x * current.w < Mouse.position.x &&
+                                current.x * current.w + current.w >= Mouse.position.x &&
+                                current.y * current.w < Mouse.position.y &&
+                                current.y * current.w + current.w >= Mouse.position.y
+                            )
+                                current.overred = true;
+                            else
+                                current.overred = false;
+                            current.show();
+                        }
                     }
+                } else {
+                    console.error('Cases not defined correctly...');
                 }
             },
             mouseClientView(data) {
                 console.log('data',data);
                 console.log('mouseClientView');
+
                 this.ctx.beginPath();
-                this.ctx.rect(data.x,data.y,20,20);
-                this.ctx.fillStyle = '#000';
+                this.ctx.arc(
+                    data.x,
+                    data.y,
+                    7,
+                    0,
+                    2 * Math.PI);
+                this.ctx.fillStyle = '#999';
                 this.ctx.fill();
             },
+            loadMap(data) {
+                console.log(('loadMap'));
+                console.log(data);
+                let newData = Object.entries(JSON.parse(data));
+
+                for(let i = 0; i < newData.length; i++) {
+                    console.log(newData[i]);
+                    let c  = newData[i][1];
+                    this.cases[newData[i][0]] =
+                        new Case(c.x,c.y,this.ctx,c.mine,this.images);
+                }
+                for(let x = 0; x < this.casesX; x++) {
+                    for(let y = 0; y < this.casesY; y++) {
+                        this.cases[x+':'+y].getClosest(this.cases);
+                    }
+                }
+
+                this.draw = setInterval(()=>{
+                    this.drawCanvas();
+                },100);
+            }
         },
         mounted() {
             this.images.bomb = this.$refs["bombImage"];
 
 
             this.images.bomb.onload = ()=>{
-                this.socket = this.socket('http://127.0.0.1:3000');
-                this.socket.on('mouse', this.mouseClientView);
-
+                // this.socket = this.socket;
                 let c = this.$refs["myCanvas"];
                 this.ctx = c.getContext("2d");
-
-
-                this.socket.on('init', function(data) {
-                    console.log(data);
-                    this.cases = JSON.parse(data);
-                    if(this.cases.length > 0){
-                        this.draw = setInterval(()=>{
-                            this.drawCanvas();
-                        },100);
-                    }
-                });
+                this.socket.on('load the map', this.loadMap);
+                this.socket.on('mouse', this.mouseClientView);
 
             };
 
