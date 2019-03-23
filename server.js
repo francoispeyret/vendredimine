@@ -12,16 +12,24 @@ var socket = require('socket.io');
 
 var io = socket(server);
 
-io.sockets.on('connection', newConnection);
 
-function newConnection(socket) {
-    console.log('newConnection - '+socket.id);
-    socket.on('mouse', mouseMsg);
 
-    function mouseMsg(data) {
-        socket.broadcast.emit('mouse',data);
-        // console.log(data);
-    }
+const Rules = require('./src/classes/Rules.js');
+const gameRules = new Rules();
+const game = {
+    map: gameRules.setNewGame(null,null)
 }
 
+io.sockets.on('connection', function(socket){
 
+        var mapJson = JSON.stringify(game.map);
+        console.log(mapJson);
+        console.log(game.map);
+
+        socket.json.emit('init',game.map);
+
+        console.log('newConnection - '+socket.id);
+        socket.on('mouse', function(data) {
+            socket.emit('mouse',data);
+        });
+});

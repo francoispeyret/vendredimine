@@ -15,14 +15,14 @@ class Case {
     show() {
         this.getStrokeCase();
         this.getCaseDisplay();
-        if(this.clicked) {
+        //if(this.clicked) {
             if(!this.mine) {
 
                 this.getNumberDisplay();
             } else {
                 this.getMineDisplay();
             }
-        }
+        //}
     }
 
     getCaseDisplay() {
@@ -175,4 +175,4 @@ class Case {
     }
 }
 
-export default Case;
+module.exports = Case;

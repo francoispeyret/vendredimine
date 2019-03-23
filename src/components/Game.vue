@@ -15,7 +15,7 @@
     </div>
 </template>
 <script>
-    import Rules from '../classes/Rules.js';
+    //import Rules from '../classes/Rules.js';
     import Mouse from '../classes/Mouse.js';
     import io from 'socket.io-client';
 
@@ -27,7 +27,7 @@
                 cases: [],
                 casesX: 10,
                 casesY: 10,
-                rules: new Rules(),
+                //rules: new Rules(),
                 ctx: null,
                 socket: io,
                 images: {}
@@ -42,11 +42,11 @@
                             current.setClicked();
                             if(current.mine === true) {
                                 this.drawCanvas();
-                                setTimeout(()=>{
+                                /*setTimeout(()=>{
 
                                     this.rules.setEndGame();
                                     this.cases = this.rules.setNewGame(this.ctx,this.images);
-                                },100);
+                                },100);*/
                             }
                             if(current.closestNumber===0) {
                                 current.clickClosest(this.cases,current.x,current.y);
@@ -99,24 +99,30 @@
                 this.ctx.rect(data.x,data.y,20,20);
                 this.ctx.fillStyle = '#000';
                 this.ctx.fill();
-            }
+            },
         },
         mounted() {
             this.images.bomb = this.$refs["bombImage"];
 
 
             this.images.bomb.onload = ()=>{
-                this.socket = this.socket('http://192.168.212.66:3000');
+                this.socket = this.socket('http://127.0.0.1:3000');
                 this.socket.on('mouse', this.mouseClientView);
 
                 let c = this.$refs["myCanvas"];
                 this.ctx = c.getContext("2d");
 
-                this.cases = this.rules.setNewGame(this.ctx,this.images);
 
-                this.draw = setInterval(()=>{
-                    this.drawCanvas();
-                },100);
+                this.socket.on('init', function(data) {
+                    console.log(data);
+                    this.cases = JSON.parse(data);
+                    if(this.cases.length > 0){
+                        this.draw = setInterval(()=>{
+                            this.drawCanvas();
+                        },100);
+                    }
+                });
+
             };
 
 
