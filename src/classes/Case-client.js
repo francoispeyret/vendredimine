@@ -1,12 +1,12 @@
 class Case {
-    constructor(x, y, ctx, mine,images) {
+    constructor(x, y, ctx, mine,images, clicked) {
         this.x = x;
         this.y = y;
         this.w = 29;
         this.ctx = ctx;
         this.mine = mine;
         this.overred = false;
-        this.clicked = false;
+        this.clicked = clicked || false;
         this.closestNumber = 0;
         this.safeMode = false;
         this.images = images;
@@ -15,14 +15,14 @@ class Case {
     show() {
         this.getStrokeCase();
         this.getCaseDisplay();
-        //if(this.clicked) {
+        if(this.clicked) {
             if(!this.mine) {
 
                 this.getNumberDisplay();
             } else {
                 this.getMineDisplay();
             }
-        //}
+        }
     }
 
     getCaseDisplay() {

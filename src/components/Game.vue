@@ -30,12 +30,14 @@
                 casesY: 10,
                 //rules: new Rules(),
                 ctx: null,
-                socket: io('http://127.0.0.1:3000'),
+                socket: io('http://192.168.212.66:3000'),
                 images: {}
             }
         },
         methods: {
             clickOnCanvas() {
+                this.socket.emit('click',Mouse);
+                console.log('click');
                 for(let x = 0; x < this.casesX; x++) {
                     for(let y = 0; y < this.casesY; y++) {
                         let current  = this.cases[x+':'+y];
@@ -96,8 +98,6 @@
                 }
             },
             mouseClientView(data) {
-                console.log('data',data);
-                console.log('mouseClientView');
 
                 this.ctx.beginPath();
                 this.ctx.arc(
@@ -110,15 +110,12 @@
                 this.ctx.fill();
             },
             loadMap(data) {
-                console.log(('loadMap'));
-                console.log(data);
                 let newData = Object.entries(JSON.parse(data));
 
                 for(let i = 0; i < newData.length; i++) {
-                    console.log(newData[i]);
                     let c  = newData[i][1];
                     this.cases[newData[i][0]] =
-                        new Case(c.x,c.y,this.ctx,c.mine,this.images);
+                        new Case(c.x,c.y,this.ctx,c.mine,this.images,c.clicked);
                 }
                 for(let x = 0; x < this.casesX; x++) {
                     for(let y = 0; y < this.casesY; y++) {
