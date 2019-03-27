@@ -30,7 +30,7 @@
                 casesY: 10,
                 //rules: new Rules(),
                 ctx: null,
-                socket: io('http://192.168.212.66:3000'),
+                socket: io('http://www.francoispeyret.fr:3000'),
                 images: {}
             }
         },
