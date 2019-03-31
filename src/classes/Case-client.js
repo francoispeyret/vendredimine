@@ -1,5 +1,5 @@
 class Case {
-    constructor(x, y, ctx, mine,images, clicked) {
+    constructor(x, y, ctx, mine, safeMode,images, clicked) {
         this.x = x;
         this.y = y;
         this.w = 29;
@@ -8,7 +8,7 @@ class Case {
         this.overred = false;
         this.clicked = clicked || false;
         this.closestNumber = 0;
-        this.safeMode = false;
+        this.safeMode = safeMode || false;
         this.images = images;
     }
 
@@ -17,7 +17,6 @@ class Case {
         this.getCaseDisplay();
         if(this.clicked) {
             if(!this.mine) {
-
                 this.getNumberDisplay();
             } else {
                 this.getMineDisplay();
@@ -62,7 +61,7 @@ class Case {
             this.ctx.fillStyle = "#fff";
         } else {
             if(this.safeMode) {
-                this.ctx.fillStyle = "tomato";
+                this.ctx.fillStyle = "red";
             } else {
                 if(this.overred)
                     this.ctx.fillStyle = "#eee";
@@ -73,7 +72,7 @@ class Case {
     }
 
     getNumberDisplay() {
-        if(!this.mine /*&& this.clicked*/) {
+        if(!this.mine && this.clicked) {
             if(this.closestNumber === 0)
                 this.ctx.fillStyle = "#f0f0f0";
             else if(this.closestNumber === 1)
