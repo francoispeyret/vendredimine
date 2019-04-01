@@ -2,7 +2,7 @@
     <div>
         <canvas
                 ref="myCanvas"
-                width="300" height="300"
+                width="500" height="500"
                 @click="clickOnCanvas"
                 @mousemove="mousemoveOnCanvas"
                 @contextmenu="rightClickOnCanvas"

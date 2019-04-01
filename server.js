@@ -29,8 +29,8 @@ io.sockets.on('connection', socket => {
     socket.on('click', (data)=> {
         console.log(data);
 
-        let xCible = Math.floor((data.position.x-8)/29);
-        let yCible = Math.floor((data.position.y-8)/29);
+        let xCible = Math.floor((data.position.x-8)/49);
+        let yCible = Math.floor((data.position.y-8)/49);
 
         console.log('xCible',xCible);
         console.log('yCible',yCible);
@@ -53,8 +53,8 @@ io.sockets.on('connection', socket => {
     socket.on('rightClick', (data)=> {
         console.log(data);
 
-        let xCible = Math.floor((data.position.x-8)/29);
-        let yCible = Math.floor((data.position.y-8)/29);
+        let xCible = Math.floor((data.position.x-8)/49);
+        let yCible = Math.floor((data.position.y-8)/49);
 
         console.log('xCibleRightClick',xCible);
         console.log('xCibleRightClick',yCible);
