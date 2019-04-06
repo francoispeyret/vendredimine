@@ -2,7 +2,7 @@
     <div>
         <canvas
                 ref="myCanvas"
-                width="500" height="500"
+                width="750" height="750"
                 @click="clickOnCanvas"
                 @mousemove="mousemoveOnCanvas"
                 @contextmenu="rightClickOnCanvas"
@@ -36,8 +36,8 @@
             return {
                 draw: null,
                 cases: [],
-                casesX: 10,
-                casesY: 10,
+                casesX: 15,
+                casesY: 15,
                 gameOverDisplay: false,
                 //rules: new Rules(),
                 ctx: null,
@@ -128,6 +128,8 @@
                 this.ctx.fill();
             },
             loadMap(data) {
+
+                this.gameOverDisplay = false;
                 console.log('loadMap');
                 let newData = Object.entries(JSON.parse(data));
 
