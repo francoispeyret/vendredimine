@@ -2,13 +2,18 @@
     <div>
         <canvas
                 ref="myCanvas"
-                width="750" height="750"
+                width="600" height="600"
                 @click="clickOnCanvas"
                 @mousemove="mousemoveOnCanvas"
                 @contextmenu="rightClickOnCanvas"
         ></canvas>
-        <div class="">
+        <div class="" style="width:600px;">
             <button type="button" name="button" @click="serverGetNewGame">New game</button>
+
+            <div style="float:right;">
+            <input type="text" name="playerName" v-model="playerName" ref="playerName" placeholder="My pseudo">
+            <button type="button" name="button" @click="serverSetMyName">Save</button>
+            </div>
         </div>
         <div class="gameover" ref="gameOver" v-if="gameOverDisplay">
 
@@ -25,9 +30,9 @@
     </div>
 </template>
 <script>
-    //import Rules from '../classes/Rules.js';
     import Case from '../classes/Case-client.js';
     import Mouse from '../classes/Mouse.js';
+    import Player from '../classes/Player-client.js';
     import io from 'socket.io-client';
 
     export default {
@@ -35,14 +40,18 @@
         data () {
             return {
                 draw: null,
+                playerName: '',
                 cases: [],
-                casesX: 15,
-                casesY: 15,
+                casesX: 12,
+                casesY: 12,
                 gameOverDisplay: false,
                 //rules: new Rules(),
                 ctx: null,
                 socket: io('http://vendredimine.francoispeyret.fr:3000'),
-                images: {}
+                images: {},
+                players: [
+                    new Player('1','Michel')
+                ]
             }
         },
         methods: {
@@ -54,46 +63,19 @@
             clickOnCanvas() {
                 this.socket.emit('click',Mouse);
                 console.log('click');
-                /*for(let x = 0; x < this.casesX; x++) {
-                    for(let y = 0; y < this.casesY; y++) {
-                        let current  = this.cases[x+':'+y];
-                        if(current.overred === true) {
-                            current.setClicked();
-                            if(current.mine === true) {
-                                this.drawCanvas();
-                                /*setTimeout(()=>{
-
-                                    this.rules.setEndGame();
-                                    this.cases = this.rules.setNewGame(this.ctx,this.images);
-                                },100);*//*
-                            }
-                            if(current.closestNumber===0) {
-                                current.clickClosest(this.cases,current.x,current.y);
-                            }
-                        }
-                    }
-                }*/
             },
             rightClickOnCanvas(e) {
                 e.preventDefault();
                 this.socket.emit('rightClick',Mouse);
                 console.log('rightClick');
-                /*for(let x = 0; x < this.casesX; x++) {
-                    for(let y = 0; y < this.casesY; y++) {
-                        let current  = this.cases[x+':'+y];
-                        if(current.overred === true && !current.clicked) {
-                            current.setRightClicked();
-                        }
-                    }
-                }*/
             },
             mousemoveOnCanvas(e) {
                 Mouse.mouseOver(e,this.socket);
             },
             drawCanvas() {
                 // fond
-                this.ctx.fillStyle = '#fff';
-                this.ctx.fillRect(0,0,600,600);
+                this.ctx.fillStyle = '#333';
+                this.ctx.fillRect(0,0,750,750);
 
                 if(typeof this.cases[0+':'+0] !== 'undefined') {
                     for(let x = 0; x < this.casesX; x++) {
@@ -113,6 +95,10 @@
                     }
                 } else {
                     console.error('Cases not defined correctly...');
+                }
+
+                for(let p = 0; p < this.players.length; p++) {
+                    this.players[p].showCursor(this.ctx);
                 }
             },
             mouseClientView(data) {
@@ -154,7 +140,21 @@
                 console.log('serverGetNewGame');
                 this.socket.emit('getNewGame');
                 this.gameOverDisplay = false;
-            }
+            },
+            serverSetMyName() {
+                console.log('serverSetMyName',this.playerName);
+                this.socket.emit('setMyName',this.playerName);
+
+            },
+            playersShow(data) {
+                let newData = Object.entries(JSON.parse(data));
+                console.log(newData);
+                let newDataClass = [];
+                for(let p = 0; p < newData.length; p++) {
+                    newDataClass[newData[p].id] = new Player(newData[p].id,newData[p].name)
+                }
+                this.players = newData;
+            },
         },
         mounted() {
             this.images.bomb = this.$refs["bombImage"];
@@ -167,6 +167,7 @@
                 this.socket.on('load the map', this.loadMap);
                 this.socket.on('mouse', this.mouseClientView);
                 this.socket.on('gameover', this.gameOver);
+                this.socket.on('players', this.playersShow);
 
             };
 
@@ -200,11 +201,18 @@
         left: calc(50% - 120px);
         height: 80px;
         width: 240px;
+        z-index: 100;
+    }
+    input,
+    button {
+        color: #fff;
         border: 0;
         background: #333;
         text-transform: uppercase;
         font-size: 32px;
-        color: #fff;
-        z-index: 100;
+    }
+    button:hover {
+        background: #000;
+        cursor: pointer;
     }
 </style>

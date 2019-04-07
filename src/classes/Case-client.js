@@ -2,7 +2,7 @@ class Case {
     constructor(x, y, ctx, mine, safeMode,images, clicked) {
         this.x = x;
         this.y = y;
-        this.w = 49;
+        this.w = 49.75;
         this.ctx = ctx;
         this.mine = mine;
         this.overred = false;
@@ -38,9 +38,9 @@ class Case {
 
     getMineDisplay() {
         this.ctx.drawImage(this.images.bomb,
-            this.x * this.w+3,
-            this.y * this.w+3,
-            22,22);
+            this.x * this.w+9,
+            this.y * this.w+9,
+            this.w/1.5,this.w/1.5);
     }
 
     getStrokeCase() {
@@ -58,15 +58,15 @@ class Case {
 
     getCaseColor() {
         if(this.clicked) {
-            this.ctx.fillStyle = "#fff";
+            this.ctx.fillStyle = "#333";
         } else {
             if(this.safeMode) {
                 this.ctx.fillStyle = "red";
             } else {
                 if(this.overred)
-                    this.ctx.fillStyle = "#eee";
+                    this.ctx.fillStyle = "#000";
                 else
-                    this.ctx.fillStyle = "white";
+                    this.ctx.fillStyle = "#333";
             }
         }
     }

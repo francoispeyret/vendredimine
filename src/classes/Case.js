@@ -2,7 +2,7 @@ class Case {
     constructor(x, y, ctx, mine,images) {
         this.x = x;
         this.y = y;
-        this.w = 49;
+        this.w = 49.75;
         this.ctx = ctx;
         this.mine = mine;
         this.overred = false;

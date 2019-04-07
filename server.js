@@ -12,7 +12,8 @@ var socket = require('socket.io');
 
 var io = socket(server);
 
-
+const Player = require('./src/classes/Player.js');
+let players = {};
 
 const Rules = require('./src/classes/Rules.js');
 const gameRules = new Rules();
@@ -20,10 +21,14 @@ let gameMap = gameRules.setNewGame(null,null);
 
 io.sockets.on('connection', socket => {
     console.log('newConnection - '+socket.id);
+
+    players[socket.id] = new Player(socket.id,'player'+socket.id[0]);
+
     let data = JSON.stringify(gameMap);
     io.sockets.emit('load the map',data);
 
     socket.on('mouse', function(data) {
+        players[socket.id].setCursorPosition(data.x, data.y);
         socket.broadcast.emit('mouse',data);
     });
     socket.on('click', (data)=> {
@@ -77,3 +82,11 @@ io.sockets.on('connection', socket => {
     });
 
 });
+
+
+setInterval(()=>{
+    console.log(players);
+    let data = JSON.stringify(players);
+    console.log(data);
+    io.sockets.emit('players',data);
+},125);

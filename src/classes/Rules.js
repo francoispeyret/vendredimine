@@ -6,9 +6,9 @@ class Rules {
     constructor() {
         this.version = 1.0;
         this.answer = 42;
-        this.casesX = 15;
-        this.casesY = 15;
-        this.maxRandom = 10;
+        this.casesX = 12;
+        this.casesY = 12;
+        this.maxRandom = 15;
         this.randomDifficulty = 1;
     }
     setEndGame() {
